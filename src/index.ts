@@ -9,6 +9,7 @@ export type {
   Period,
   TimelineEvent,
   EventStatus,
+  StatusChange,
   TimelineConfig,
   TimelineProps,
   VisibleRange,
