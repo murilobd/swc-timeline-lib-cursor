@@ -1,28 +1,24 @@
-.indicator {
-  position: absolute;
-  top: calc(var(--timeline-header-height, 48px) - 6px);
-  bottom: 0;
-  z-index: 30;
-  pointer-events: none;
-  transform: translateX(-50%);
-}
-
 .dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: var(--timeline-accent, #7C7CFF);
   position: absolute;
-  top: -5px;
-  left: 50%;
+  top: calc(var(--timeline-header-height, 48px) - 10px);
   transform: translateX(-50%);
   box-shadow: 0 2px 4px rgba(124, 124, 255, 0.4);
+  z-index: 25;
+  pointer-events: none;
 }
 
 .line {
+  position: absolute;
+  top: var(--timeline-header-height, 48px);
+  bottom: 0;
   width: 2px;
-  height: 100%;
   background: var(--timeline-accent, #7C7CFF);
-  margin: 0 auto;
   opacity: 0.8;
+  z-index: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
 }

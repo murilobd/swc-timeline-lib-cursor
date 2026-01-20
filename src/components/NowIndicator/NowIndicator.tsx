@@ -24,14 +24,15 @@ export function NowIndicator() {
   }
 
   return (
-    <div
-      className={styles.indicator}
-      style={{
-        left: leftPosition,
-      }}
-    >
-      <div className={styles.dot} />
-      <div className={styles.line} />
-    </div>
+    <>
+      <div
+        className={styles.dot}
+        style={{ left: leftPosition }}
+      />
+      <div
+        className={styles.line}
+        style={{ left: leftPosition }}
+      />
+    </>
   )
 }
