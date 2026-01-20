@@ -6,7 +6,7 @@ A flexible, generic React + TypeScript timeline library for visualizing time-bas
 
 - **Configurable Rows** - Each row can have an indicator and availability status
 - **Dynamic Periods** - Time-bounded segments that define row labels (e.g., shift schedules)
-- **Event Visualization** - Task/event blocks with multiple status states (scheduled, in-progress, delayed, early, blocked, completed)
+- **Event Visualization** - Task/event blocks with multiple status states (planned, in-progress, delayed, early, blocked, completed)
 - **Shift Handover** - Visual transition overlay when periods change
 - **Now Indicator** - Real-time current time marker
 - **Flexible Time Range** - Configurable start/end dates with French, 12h, or 24h time formats

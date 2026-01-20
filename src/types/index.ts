@@ -30,7 +30,7 @@ export interface Period {
 
 // Event status for visual styling
 export type EventStatus =
-  | 'scheduled'
+  | 'planned'
   | 'in-progress'
   | 'delayed'
   | 'early'
@@ -44,10 +44,18 @@ export interface TimelineEvent {
   startTime: Date
   endTime: Date
   actualEndTime?: Date // For overflow visualization (delayed tasks)
+  actualDuration?: number // Actual duration in minutes (for early/late calculation)
   title: string
   status?: EventStatus
   color?: string
   data?: unknown // Custom payload for renderEvent
+}
+
+// Status change result
+export interface StatusChange {
+  eventId: string
+  newStatus: EventStatus
+  actualDuration?: number // For delayed/early - actual duration in minutes
 }
 
 // Period markers configuration
@@ -108,6 +116,7 @@ export interface TimelineProps {
   onSlotClick?: (rowId: string, time: Date) => void
   onScroll?: (visibleRange: VisibleRange) => void
   onEventMove?: (moves: EventMove[]) => void
+  onStatusChange?: (change: StatusChange) => void
 
   // Layout
   rowColumnWidth?: { expanded: number; collapsed: number }

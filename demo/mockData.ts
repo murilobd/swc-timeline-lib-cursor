@@ -88,7 +88,7 @@ export const mockEvents: TimelineEvent[] = [
     startTime: addHours(today, 14),
     endTime: addHours(today, 15),
     title: 'Task',
-    status: 'scheduled',
+    status: 'planned',
   },
   {
     id: 'event-5',
@@ -113,7 +113,7 @@ export const mockEvents: TimelineEvent[] = [
     startTime: addHours(today, 13.5),
     endTime: addMinutes(addHours(today, 13), 50),
     title: 'Task',
-    status: 'scheduled',
+    status: 'planned',
   },
   {
     id: 'event-8',
@@ -145,7 +145,7 @@ export const mockEvents: TimelineEvent[] = [
     startTime: addHours(today, 14),
     endTime: addHours(today, 15),
     title: 'Task',
-    status: 'scheduled',
+    status: 'planned',
   },
   {
     id: 'event-12',

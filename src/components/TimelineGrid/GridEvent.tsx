@@ -9,7 +9,7 @@ interface GridEventProps {
 }
 
 const STATUS_COLORS: Record<EventStatus, { border: string; bg: string }> = {
-  scheduled: { border: '#C4C4FF', bg: '#FFFFFF' },
+  planned: { border: '#C4C4FF', bg: '#FFFFFF' },
   'in-progress': { border: '#7C7CFF', bg: '#FFFFFF' },
   delayed: { border: '#FF6B6B', bg: '#FFFFFF' },
   early: { border: '#4CAF50', bg: '#FFFFFF' },
@@ -28,8 +28,8 @@ export function GridEvent({ event }: GridEventProps) {
 
   // Get colors based on status
   const colors = useMemo(() => {
-    const status = event.status ?? 'scheduled'
-    return STATUS_COLORS[status] ?? STATUS_COLORS.scheduled
+    const status = event.status ?? 'planned'
+    return STATUS_COLORS[status] ?? STATUS_COLORS.planned
   }, [event.status])
 
   // Handle click
@@ -86,7 +86,7 @@ export function GridEvent({ event }: GridEventProps) {
           borderLeftColor: colors.border,
           backgroundColor: colors.bg,
         }}
-        data-status={event.status ?? 'scheduled'}
+        data-status={event.status ?? 'planned'}
         draggable={isDraggable}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}

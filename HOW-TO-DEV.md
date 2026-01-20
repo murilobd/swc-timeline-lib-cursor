@@ -309,7 +309,7 @@ const handleScroll = (e) => {
 
 ```typescript
 const STATUS_COLORS = {
-  'scheduled':   { border: '#C4C4FF', bg: '#FFFFFF' },
+  'planned':     { border: '#C4C4FF', bg: '#FFFFFF' },
   'in-progress': { border: '#7C7CFF', bg: '#FFFFFF' },
   'delayed':     { border: '#FF6B6B', bg: '#FFFFFF' },
   'early':       { border: '#4CAF50', bg: '#FFFFFF' },
@@ -355,7 +355,7 @@ export function formatHour(date: Date, hourFormat: TimelineConfig['hourFormat'])
 
 ```typescript
 const STATUS_COLORS: Record<EventStatus, { border: string; bg: string }> = {
-  scheduled: { border: '#C4C4FF', bg: '#FFFFFF' },
+  planned: { border: '#C4C4FF', bg: '#FFFFFF' },
   // Change delayed to orange:
   delayed: { border: '#FFA500', bg: '#FFF3E0' },
   // ...
@@ -393,7 +393,7 @@ And in CSS modules:
 
 ```typescript
 export type EventStatus =
-  | 'scheduled'
+  | 'planned'
   | 'in-progress'
   | 'delayed'
   | 'early'
