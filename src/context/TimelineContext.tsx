@@ -18,6 +18,7 @@ import type {
   ResolvedTimelineConfig,
   VisibleRange,
   EventMove,
+  StatusChange,
 } from '../types'
 import {
   DEFAULT_SLOT_DURATION,
@@ -41,6 +42,10 @@ interface TimelineContextValue {
   visibleRange: VisibleRange
   draggingEventId: string | null
 
+  // Modal state
+  modalEvent: TimelineEvent | null
+  isModalOpen: boolean
+
   // Refs
   scrollContainerRef: RefObject<HTMLDivElement | null>
 
@@ -53,12 +58,15 @@ interface TimelineContextValue {
   scrollToTime: (time: Date) => void
   setRowColumnHovered: (value: boolean) => void
   setDraggingEventId: (eventId: string | null) => void
+  openEventModal: (event: TimelineEvent) => void
+  closeEventModal: () => void
 
   // Callbacks from props
   onEventClick?: (event: TimelineEvent) => void
   onSlotClick?: (rowId: string, time: Date) => void
   onScroll?: (visibleRange: VisibleRange) => void
   onEventMove?: (moves: EventMove[]) => void
+  onStatusChange?: (change: StatusChange) => void
 
   // Custom rendering
   renderEvent?: (event: TimelineEvent, defaultRender: ReactNode) => ReactNode
@@ -77,6 +85,7 @@ interface TimelineProviderProps {
   onSlotClick?: (rowId: string, time: Date) => void
   onScroll?: (visibleRange: VisibleRange) => void
   onEventMove?: (moves: EventMove[]) => void
+  onStatusChange?: (change: StatusChange) => void
   renderEvent?: (event: TimelineEvent, defaultRender: ReactNode) => ReactNode
   renderRowLabel?: (row: Row, label: string, isCollapsed: boolean) => ReactNode
   rowColumnWidth?: { expanded: number; collapsed: number }
@@ -92,6 +101,7 @@ export function TimelineProvider({
   onSlotClick,
   onScroll,
   onEventMove,
+  onStatusChange,
   renderEvent,
   renderRowLabel,
   rowColumnWidth: rowColumnWidthConfig,
@@ -142,6 +152,19 @@ export function TimelineProvider({
 
   // Drag state
   const [draggingEventId, setDraggingEventId] = useState<string | null>(null)
+
+  // Modal state
+  const [modalEvent, setModalEvent] = useState<TimelineEvent | null>(null)
+  const isModalOpen = modalEvent !== null
+
+  // Modal actions
+  const openEventModal = useCallback((event: TimelineEvent) => {
+    setModalEvent(event)
+  }, [])
+
+  const closeEventModal = useCallback(() => {
+    setModalEvent(null)
+  }, [])
 
   // Row column width
   const expandedWidth =
@@ -225,6 +248,8 @@ export function TimelineProvider({
       isRowColumnHovered,
       visibleRange,
       draggingEventId,
+      modalEvent,
+      isModalOpen,
       scrollContainerRef,
       rowColumnWidth,
       totalGridWidth,
@@ -232,10 +257,13 @@ export function TimelineProvider({
       scrollToTime,
       setRowColumnHovered,
       setDraggingEventId,
+      openEventModal,
+      closeEventModal,
       onEventClick,
       onSlotClick,
       onScroll,
       onEventMove,
+      onStatusChange,
       renderEvent,
       renderRowLabel,
     }),
@@ -250,15 +278,20 @@ export function TimelineProvider({
       isRowColumnHovered,
       visibleRange,
       draggingEventId,
+      modalEvent,
+      isModalOpen,
       rowColumnWidth,
       totalGridWidth,
       setScrollLeft,
       scrollToTime,
       setRowColumnHovered,
+      openEventModal,
+      closeEventModal,
       onEventClick,
       onSlotClick,
       onScroll,
       onEventMove,
+      onStatusChange,
       renderEvent,
       renderRowLabel,
     ]
