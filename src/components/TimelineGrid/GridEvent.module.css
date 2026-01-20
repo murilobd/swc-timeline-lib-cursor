@@ -25,17 +25,26 @@
 
 /* Status-specific styles */
 .event[data-status="in-progress"] {
-  border-color: var(--timeline-accent, #7C7CFF);
-  box-shadow: 0 0 0 1px var(--timeline-accent, #7C7CFF);
+  border: 2px solid var(--timeline-accent, #7C7CFF);
+  border-left-width: 4px;
 }
 
 .event[data-status="blocked"] {
   color: #fff;
   cursor: not-allowed;
+  border-color: #8B0000;
 }
 
 .event[data-status="completed"] {
-  opacity: 0.7;
+  opacity: 0.8;
+}
+
+.event[data-status="delayed"] {
+  border-left-color: #FF6B6B;
+}
+
+.event[data-status="early"] {
+  border-left-color: #4CAF50;
 }
 
 .eventContent {
@@ -44,15 +53,57 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  gap: 4px;
 }
 
 .eventTitle {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: inherit;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.eventDuration {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #666;
+}
+
+.event[data-status="blocked"] .eventDuration {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.timerIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.durationText {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.durationModifier {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.durationModifier.delayed {
+  color: #D32F2F;
+}
+
+.durationModifier.early {
+  color: #2E7D32;
+}
+
+.event[data-status="blocked"] .durationModifier {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* Overflow indicator for delayed events */
@@ -61,6 +112,13 @@
   top: 8px;
   bottom: 8px;
   border-radius: 0 4px 4px 0;
-  opacity: 0.6;
+  opacity: 0.4;
   z-index: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    #FF6B6B,
+    #FF6B6B 4px,
+    #FF8A8A 4px,
+    #FF8A8A 8px
+  );
 }
