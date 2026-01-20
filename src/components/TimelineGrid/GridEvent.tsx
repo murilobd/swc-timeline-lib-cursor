@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState } from 'react'
 import { useTimeline } from '../../context/TimelineContext'
 import { getEventLayout } from '../../utils/layoutUtils'
 import type { TimelineEvent, EventStatus } from '../../types'
@@ -18,7 +18,8 @@ const STATUS_COLORS: Record<EventStatus, { border: string; bg: string }> = {
 }
 
 export function GridEvent({ event }: GridEventProps) {
-  const { config, onEventClick, renderEvent } = useTimeline()
+  const { config, onEventClick, onEventMove, renderEvent } = useTimeline()
+  const [isDragging, setIsDragging] = useState(false)
 
   // Calculate position and dimensions
   const layout = useMemo(() => {
@@ -40,6 +41,28 @@ export function GridEvent({ event }: GridEventProps) {
     [onEventClick, event]
   )
 
+  // Determine if event can be dragged (not blocked, and onEventMove is provided)
+  const isDraggable = event.status !== 'blocked' && !!onEventMove
+
+  // Handle drag start
+  const handleDragStart = useCallback(
+    (e: React.DragEvent) => {
+      if (!isDraggable) {
+        e.preventDefault()
+        return
+      }
+      e.dataTransfer.setData('text/plain', event.id)
+      e.dataTransfer.effectAllowed = 'move'
+      setIsDragging(true)
+    },
+    [event.id, isDraggable]
+  )
+
+  // Handle drag end
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
   // Default render content
   const defaultRender = (
     <div className={styles.eventContent}>
@@ -50,13 +73,11 @@ export function GridEvent({ event }: GridEventProps) {
   // Check for custom rendering
   const content = renderEvent ? renderEvent(event, defaultRender) : defaultRender
 
-  const isBlocked = event.status === 'blocked'
-
   return (
     <>
       {/* Main event block */}
       <div
-        className={styles.event}
+        className={`${styles.event} ${isDragging ? styles.dragging : ''}`}
         style={{
           left: layout.left,
           width: layout.width,
@@ -64,6 +85,9 @@ export function GridEvent({ event }: GridEventProps) {
           backgroundColor: colors.bg,
         }}
         data-status={event.status ?? 'scheduled'}
+        draggable={isDraggable}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
         onClick={handleClick}
       >
         {content}

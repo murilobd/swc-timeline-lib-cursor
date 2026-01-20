@@ -7,9 +7,15 @@
   border-left-width: 4px;
   background: #fff;
   overflow: hidden;
-  cursor: pointer;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  cursor: grab;
+  transition: box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   z-index: 1;
+}
+
+.event.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  z-index: 10;
 }
 
 .event:hover {
@@ -25,6 +31,7 @@
 
 .event[data-status="blocked"] {
   color: #fff;
+  cursor: not-allowed;
 }
 
 .event[data-status="completed"] {
