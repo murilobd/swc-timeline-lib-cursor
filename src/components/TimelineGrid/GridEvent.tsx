@@ -57,7 +57,7 @@ function TimerIcon({ className }: { className?: string }) {
 }
 
 export function GridEvent({ event }: GridEventProps) {
-  const { config, onEventClick, onEventMove, renderEvent, setDraggingEventId } = useTimeline()
+  const { config, onEventClick, onEventMove, onStatusChange, openEventModal, renderEvent, setDraggingEventId } = useTimeline()
   const [isDragging, setIsDragging] = useState(false)
 
   // Calculate position and dimensions
@@ -121,8 +121,13 @@ export function GridEvent({ event }: GridEventProps) {
     (e: React.MouseEvent) => {
       e.stopPropagation() // Prevent slot click
       onEventClick?.(event)
+      
+      // Open modal if onStatusChange is provided
+      if (onStatusChange) {
+        openEventModal(event)
+      }
     },
-    [onEventClick, event]
+    [onEventClick, onStatusChange, openEventModal, event]
   )
 
   // Determine if event can be dragged (not blocked, and onEventMove is provided)
