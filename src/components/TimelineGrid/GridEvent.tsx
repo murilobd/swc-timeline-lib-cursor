@@ -18,7 +18,7 @@ const STATUS_COLORS: Record<EventStatus, { border: string; bg: string }> = {
 }
 
 export function GridEvent({ event }: GridEventProps) {
-  const { config, onEventClick, onEventMove, renderEvent } = useTimeline()
+  const { config, onEventClick, onEventMove, renderEvent, setDraggingEventId } = useTimeline()
   const [isDragging, setIsDragging] = useState(false)
 
   // Calculate position and dimensions
@@ -54,14 +54,16 @@ export function GridEvent({ event }: GridEventProps) {
       e.dataTransfer.setData('text/plain', event.id)
       e.dataTransfer.effectAllowed = 'move'
       setIsDragging(true)
+      setDraggingEventId(event.id)
     },
-    [event.id, isDraggable]
+    [event.id, isDraggable, setDraggingEventId]
   )
 
   // Handle drag end
   const handleDragEnd = useCallback(() => {
     setIsDragging(false)
-  }, [])
+    setDraggingEventId(null)
+  }, [setDraggingEventId])
 
   // Default render content
   const defaultRender = (

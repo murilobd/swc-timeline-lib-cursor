@@ -39,6 +39,7 @@ interface TimelineContextValue {
   isCollapsed: boolean
   isRowColumnHovered: boolean
   visibleRange: VisibleRange
+  draggingEventId: string | null
 
   // Refs
   scrollContainerRef: RefObject<HTMLDivElement | null>
@@ -51,6 +52,7 @@ interface TimelineContextValue {
   setScrollLeft: (value: number) => void
   scrollToTime: (time: Date) => void
   setRowColumnHovered: (value: boolean) => void
+  setDraggingEventId: (eventId: string | null) => void
 
   // Callbacks from props
   onEventClick?: (event: TimelineEvent) => void
@@ -138,6 +140,9 @@ export function TimelineProvider({
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isRowColumnHovered, setRowColumnHovered] = useState(false)
 
+  // Drag state
+  const [draggingEventId, setDraggingEventId] = useState<string | null>(null)
+
   // Row column width
   const expandedWidth =
     rowColumnWidthConfig?.expanded ?? DEFAULT_ROW_COLUMN_WIDTH_EXPANDED
@@ -219,12 +224,14 @@ export function TimelineProvider({
       isCollapsed,
       isRowColumnHovered,
       visibleRange,
+      draggingEventId,
       scrollContainerRef,
       rowColumnWidth,
       totalGridWidth,
       setScrollLeft,
       scrollToTime,
       setRowColumnHovered,
+      setDraggingEventId,
       onEventClick,
       onSlotClick,
       onScroll,
@@ -242,6 +249,7 @@ export function TimelineProvider({
       isCollapsed,
       isRowColumnHovered,
       visibleRange,
+      draggingEventId,
       rowColumnWidth,
       totalGridWidth,
       setScrollLeft,
