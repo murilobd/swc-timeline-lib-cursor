@@ -36,6 +36,7 @@ interface TimelineContextValue {
   currentTime: Date
   scrollLeft: number
   isCollapsed: boolean
+  isRowColumnHovered: boolean
   visibleRange: VisibleRange
 
   // Refs
@@ -48,6 +49,7 @@ interface TimelineContextValue {
   // Actions
   setScrollLeft: (value: number) => void
   scrollToTime: (time: Date) => void
+  setRowColumnHovered: (value: boolean) => void
 
   // Callbacks from props
   onEventClick?: (event: TimelineEvent) => void
@@ -130,6 +132,7 @@ export function TimelineProvider({
   // Scroll state
   const [scrollLeft, setScrollLeftState] = useState(0)
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isRowColumnHovered, setRowColumnHovered] = useState(false)
 
   // Row column width
   const expandedWidth =
@@ -137,7 +140,8 @@ export function TimelineProvider({
   const collapsedWidth =
     rowColumnWidthConfig?.collapsed ?? DEFAULT_ROW_COLUMN_WIDTH_COLLAPSED
 
-  const rowColumnWidth = isCollapsed ? collapsedWidth : expandedWidth
+  // Expand on hover or when not collapsed
+  const rowColumnWidth = (isCollapsed && !isRowColumnHovered) ? collapsedWidth : expandedWidth
 
   // Calculate total grid width (12px per slot)
   const totalGridWidth = useMemo(() => {
@@ -209,12 +213,14 @@ export function TimelineProvider({
       currentTime,
       scrollLeft,
       isCollapsed,
+      isRowColumnHovered,
       visibleRange,
       scrollContainerRef,
       rowColumnWidth,
       totalGridWidth,
       setScrollLeft,
       scrollToTime,
+      setRowColumnHovered,
       onEventClick,
       onSlotClick,
       onScroll,
@@ -229,11 +235,13 @@ export function TimelineProvider({
       currentTime,
       scrollLeft,
       isCollapsed,
+      isRowColumnHovered,
       visibleRange,
       rowColumnWidth,
       totalGridWidth,
       setScrollLeft,
       scrollToTime,
+      setRowColumnHovered,
       onEventClick,
       onSlotClick,
       onScroll,
