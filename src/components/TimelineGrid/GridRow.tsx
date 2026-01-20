@@ -18,6 +18,7 @@ interface DropZone {
 export function GridRow({ row }: GridRowProps) {
   const { events, config, onSlotClick, onEventMove, totalGridWidth, draggingEventId } = useTimeline()
   const [isDragOver, setIsDragOver] = useState(false)
+  const [hoveredSlotLeft, setHoveredSlotLeft] = useState<number | null>(null)
 
   // Get events for this row
   const rowEvents = useMemo(() => {
@@ -93,6 +94,14 @@ export function GridRow({ row }: GridRowProps) {
       e.preventDefault()
       e.dataTransfer.dropEffect = 'move'
       setIsDragOver(true)
+
+      // Calculate which slot the mouse is over
+      const rect = e.currentTarget.getBoundingClientRect()
+      const mouseX = e.clientX - rect.left
+      const slotWidth = 12
+      const slotIdx = Math.floor(mouseX / slotWidth)
+      const slotLeft = slotIdx * slotWidth
+      setHoveredSlotLeft(slotLeft)
     },
     [isUnavailable, onEventMove]
   )
@@ -100,6 +109,7 @@ export function GridRow({ row }: GridRowProps) {
   // Handle drag leave
   const handleDragLeave = useCallback(() => {
     setIsDragOver(false)
+    setHoveredSlotLeft(null)
   }, [])
 
   // Handle drop
@@ -107,6 +117,7 @@ export function GridRow({ row }: GridRowProps) {
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault()
       setIsDragOver(false)
+      setHoveredSlotLeft(null)
 
       if (isUnavailable || !onEventMove) return
 
@@ -162,7 +173,7 @@ export function GridRow({ row }: GridRowProps) {
           {dropZones.map((zone, idx) => (
             <div
               key={`dropzone-${idx}`}
-              className={styles.dropZone}
+              className={`${styles.dropZone} ${zone.left === hoveredSlotLeft ? styles.dropZoneHovered : ''}`}
               style={{
                 left: zone.left,
                 width: zone.width,

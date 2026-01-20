@@ -56,6 +56,13 @@
   background: #D4CEED;
   pointer-events: none;
   z-index: 0;
+  transition: background-color 0.1s ease, transform 0.1s ease;
+}
+
+.dropZoneHovered {
+  background: #7C7CFF;
+  transform: scaleY(1.05);
+  z-index: 1;
 }
 
 .row[data-unavailable="true"] {
