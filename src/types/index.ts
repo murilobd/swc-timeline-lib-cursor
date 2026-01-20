@@ -81,6 +81,13 @@ export interface VisibleRange {
   end: Date
 }
 
+// Event move result for drag-and-drop
+export interface EventMove {
+  eventId: string
+  newStartTime: Date
+  newEndTime: Date
+}
+
 // Main component props
 export interface TimelineProps {
   rows: Row[]
@@ -100,6 +107,7 @@ export interface TimelineProps {
   onEventClick?: (event: TimelineEvent) => void
   onSlotClick?: (rowId: string, time: Date) => void
   onScroll?: (visibleRange: VisibleRange) => void
+  onEventMove?: (moves: EventMove[]) => void
 
   // Layout
   rowColumnWidth?: { expanded: number; collapsed: number }
