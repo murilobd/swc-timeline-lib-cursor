@@ -1,23 +1,111 @@
 import { useMemo, useCallback, useState } from 'react'
-import { addMinutes } from 'date-fns'
+import { addMinutes, differenceInMinutes } from 'date-fns'
 import { useTimeline } from '../../context/TimelineContext'
 import { calculateCascade } from '../../utils/layoutUtils'
 import { GridEvent } from './GridEvent'
-import type { Row } from '../../types'
+import type { Row, TimelineEvent } from '../../types'
 import styles from './TimelineGrid.module.css'
 
 interface GridRowProps {
   row: Row
 }
 
+interface DropZone {
+  left: number
+  width: number
+}
+
 export function GridRow({ row }: GridRowProps) {
-  const { events, config, onSlotClick, onEventMove, totalGridWidth } = useTimeline()
+  const { events, config, onSlotClick, onEventMove, totalGridWidth, draggingEventId } = useTimeline()
   const [isDragOver, setIsDragOver] = useState(false)
 
   // Get events for this row
   const rowEvents = useMemo(() => {
     return events.filter((e) => e.rowId === row.id)
   }, [events, row.id])
+
+  // Get the event being dragged (if it belongs to this row)
+  const draggingEvent = useMemo(() => {
+    if (!draggingEventId) return null
+    return rowEvents.find((e) => e.id === draggingEventId) ?? null
+  }, [draggingEventId, rowEvents])
+
+  // Calculate valid drop zones
+  const dropZones = useMemo<DropZone[]>(() => {
+    if (!draggingEvent) return []
+
+    const zones: DropZone[] = []
+    const dragDuration = differenceInMinutes(draggingEvent.endTime, draggingEvent.startTime)
+    const slotWidth = 12 // DEFAULT_SLOT_WIDTH
+    const minWidth = Math.max(slotWidth, (dragDuration / config.slotDuration) * slotWidth)
+
+    // Get other events (excluding the one being dragged), sorted by start time
+    const otherEvents = rowEvents
+      .filter((e) => e.id !== draggingEvent.id)
+      .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
+
+    // Helper to convert time to pixel position
+    const timeToPixel = (time: Date): number => {
+      const minutesFromStart = differenceInMinutes(time, config.startDate)
+      return (minutesFromStart / config.totalMinutes) * totalGridWidth
+    }
+
+    // Helper to check if a position is valid (doesn't overlap any task)
+    const isValidPosition = (startTime: Date): boolean => {
+      const endTime = addMinutes(startTime, dragDuration)
+      for (const event of otherEvents) {
+        // Skip blocked events - they can be pushed if cascade allows
+        if (event.status === 'blocked') {
+          // If dropping before or on a blocked event, check cascade
+          if (startTime < event.endTime && endTime > event.startTime) {
+            return false // Direct overlap with blocked event
+          }
+        } else {
+          // For regular events, check if drop position overlaps
+          if (startTime < event.endTime && endTime > event.startTime) {
+            return false // Overlap
+          }
+        }
+      }
+      return true
+    }
+
+    // Add zone at timeline start if valid
+    if (isValidPosition(config.startDate)) {
+      const firstEvent = otherEvents[0]
+      const endPixel = firstEvent ? timeToPixel(firstEvent.startTime) : totalGridWidth
+      zones.push({
+        left: 0,
+        width: Math.min(endPixel, minWidth),
+      })
+    }
+
+    // Add zones after each event ends
+    for (let i = 0; i < otherEvents.length; i++) {
+      const event = otherEvents[i] as TimelineEvent
+      const nextEvent = otherEvents[i + 1]
+      
+      // The drop zone starts at the end of this event
+      const zoneStart = event.endTime
+      const zoneEnd = nextEvent ? nextEvent.startTime : config.endDate
+
+      // Check if there's enough space and position is valid
+      if (isValidPosition(zoneStart)) {
+        const leftPixel = timeToPixel(zoneStart)
+        const rightPixel = timeToPixel(zoneEnd)
+        const availableWidth = rightPixel - leftPixel
+
+        if (availableWidth > 0) {
+          zones.push({
+            left: leftPixel,
+            width: Math.min(availableWidth, minWidth),
+          })
+        }
+      }
+    }
+
+    return zones
+  }, [draggingEvent, rowEvents, config, totalGridWidth])
 
   // Check if row is unavailable
   const isUnavailable =
@@ -119,7 +207,21 @@ export function GridRow({ row }: GridRowProps) {
           </span>
         </div>
       ) : (
-        rowEvents.map((event) => <GridEvent key={event.id} event={event} />)
+        <>
+          {/* Drop zone indicators */}
+          {dropZones.map((zone, idx) => (
+            <div
+              key={`dropzone-${idx}`}
+              className={styles.dropZone}
+              style={{
+                left: zone.left,
+                width: zone.width,
+              }}
+            />
+          ))}
+          {/* Events */}
+          {rowEvents.map((event) => <GridEvent key={event.id} event={event} />)}
+        </>
       )}
     </div>
   )

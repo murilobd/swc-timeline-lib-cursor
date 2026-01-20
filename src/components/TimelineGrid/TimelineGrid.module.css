@@ -46,6 +46,17 @@
   background: rgba(124, 124, 255, 0.08);
 }
 
+/* Drop zone indicator */
+.dropZone {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  border-radius: 4px;
+  background: #D4CEED;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .row[data-unavailable="true"] {
   background: var(--timeline-grid-light, #F5F5F5);
   cursor: default;
