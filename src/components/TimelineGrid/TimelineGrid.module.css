@@ -42,6 +42,10 @@
   background: rgba(124, 124, 255, 0.02);
 }
 
+.row[data-drag-over="true"] {
+  background: rgba(124, 124, 255, 0.08);
+}
+
 .row[data-unavailable="true"] {
   background: var(--timeline-grid-light, #F5F5F5);
   cursor: default;

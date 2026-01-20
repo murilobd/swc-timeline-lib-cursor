@@ -1,6 +1,7 @@
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState } from 'react'
 import { addMinutes } from 'date-fns'
 import { useTimeline } from '../../context/TimelineContext'
+import { calculateCascade } from '../../utils/layoutUtils'
 import { GridEvent } from './GridEvent'
 import type { Row } from '../../types'
 import styles from './TimelineGrid.module.css'
@@ -10,7 +11,8 @@ interface GridRowProps {
 }
 
 export function GridRow({ row }: GridRowProps) {
-  const { events, config, onSlotClick, totalGridWidth } = useTimeline()
+  const { events, config, onSlotClick, onEventMove, totalGridWidth } = useTimeline()
+  const [isDragOver, setIsDragOver] = useState(false)
 
   // Get events for this row
   const rowEvents = useMemo(() => {
@@ -21,31 +23,93 @@ export function GridRow({ row }: GridRowProps) {
   const isUnavailable =
     row.availability && row.availability.status !== 'available'
 
-  // Handle slot click
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!onSlotClick || isUnavailable) return
-
-      const rect = e.currentTarget.getBoundingClientRect()
-      const clickX = e.clientX - rect.left
+  // Calculate time from X position (snapped to slot)
+  const getTimeFromPosition = useCallback(
+    (clientX: number, rect: DOMRect): Date => {
+      const clickX = clientX - rect.left
       const clickPercent = clickX / totalGridWidth
-
       const totalMinutes = config.totalMinutes
       const minutesOffset = clickPercent * totalMinutes
       const slotMinutes =
         Math.floor(minutesOffset / config.slotDuration) * config.slotDuration
+      return addMinutes(config.startDate, slotMinutes)
+    },
+    [totalGridWidth, config]
+  )
 
-      const clickTime = addMinutes(config.startDate, slotMinutes)
+  // Handle slot click
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!onSlotClick || isUnavailable) return
+      const rect = e.currentTarget.getBoundingClientRect()
+      const clickTime = getTimeFromPosition(e.clientX, rect)
       onSlotClick(row.id, clickTime)
     },
-    [onSlotClick, isUnavailable, totalGridWidth, config, row.id]
+    [onSlotClick, isUnavailable, getTimeFromPosition, row.id]
+  )
+
+  // Handle drag over
+  const handleDragOver = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      if (isUnavailable || !onEventMove) return
+      e.preventDefault()
+      e.dataTransfer.dropEffect = 'move'
+      setIsDragOver(true)
+    },
+    [isUnavailable, onEventMove]
+  )
+
+  // Handle drag leave
+  const handleDragLeave = useCallback(() => {
+    setIsDragOver(false)
+  }, [])
+
+  // Handle drop
+  const handleDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault()
+      setIsDragOver(false)
+
+      if (isUnavailable || !onEventMove) return
+
+      const eventId = e.dataTransfer.getData('text/plain')
+      if (!eventId) return
+
+      // Check if the dragged event belongs to this row
+      const draggedEvent = rowEvents.find((ev) => ev.id === eventId)
+      if (!draggedEvent) return // Event not in this row, ignore
+
+      const rect = e.currentTarget.getBoundingClientRect()
+      const dropTime = getTimeFromPosition(e.clientX, rect)
+
+      // Calculate cascade effect
+      const result = calculateCascade(eventId, dropTime, rowEvents)
+
+      if (result === null) {
+        // Invalid drop position (overlaps existing task)
+        return
+      }
+
+      if (result.blocked) {
+        // Cascade would push a blocked task
+        return
+      }
+
+      // Call the callback with all moves
+      onEventMove(result.moves)
+    },
+    [isUnavailable, onEventMove, rowEvents, getTimeFromPosition]
   )
 
   return (
     <div
       className={styles.row}
       data-unavailable={isUnavailable}
+      data-drag-over={isDragOver}
       onClick={handleClick}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       {isUnavailable ? (
         <div className={styles.unavailableRow}>
