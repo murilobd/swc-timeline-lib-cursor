@@ -22,7 +22,7 @@ This document explains the internal architecture, data flow, and how to modify e
 │                         Timeline.tsx                             │
 │  ┌─────────────────────────────────────────────────────────────┐ │
 │  │                    TimelineProvider                          │ │
-│  │         (Context: config, scroll, currentTime)               │ │
+│  │         (Context: config, scroll, currentTime, modal)        │ │
 │  │  ┌─────────────────────────────────────────────────────────┐ │ │
 │  │  │                    TimelineHeader                        │ │ │
 │  │  │              (Time labels + Period markers)              │ │ │
@@ -37,6 +37,7 @@ This document explains the internal architecture, data flow, and how to modify e
 │  │  │ ...       │  │ ...                                     │ │ │ │
 │  │  └───────────┴─────────────────────────────────────────────┘ │ │
 │  │                        NowIndicator                          │ │
+│  │                        EventModal (when open)                │ │
 │  └─────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -85,9 +86,9 @@ This document explains the internal architecture, data flow, and how to modify e
 │                                                                    │
 │   Each component calls useTimeline() to access:                   │
 │   - Data: rows, periods, events, config                           │
-│   - State: scrollLeft, isCollapsed, currentTime                   │
-│   - Actions: setScrollLeft, scrollToTime                          │
-│   - Callbacks: onEventClick, onSlotClick                          │
+│   - State: scrollLeft, isCollapsed, currentTime, modalEvent       │
+│   - Actions: setScrollLeft, scrollToTime, openEventModal          │
+│   - Callbacks: onEventClick, onSlotClick, onStatusChange          │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -105,7 +106,7 @@ src/
 │   └── index.ts                      # All TypeScript interfaces
 │       ├── Row, RowIndicator, RowAvailability
 │       ├── Period
-│       ├── TimelineEvent, EventStatus
+│       ├── TimelineEvent, EventStatus, StatusChange
 │       ├── TimelineConfig, ResolvedTimelineConfig
 │       └── TimelineProps
 │
@@ -147,10 +148,13 @@ src/
     ├── TimelineGrid/                 # Main scrollable area
     │   ├── TimelineGrid.tsx          # Grid container + hour lines
     │   ├── GridRow.tsx               # Single row track
-    │   └── GridEvent.tsx             # Event/task card
+    │   └── GridEvent.tsx             # Event/task card with duration display
     │
-    └── NowIndicator/                 # Current time line
-        └── NowIndicator.tsx          # Purple vertical line
+    ├── NowIndicator/                 # Current time line
+    │   └── NowIndicator.tsx          # Purple vertical line
+    │
+    └── EventModal/                   # Status change modal
+        └── EventModal.tsx            # Modal for changing event status/duration
 ```
 
 ### Dependency Graph
@@ -178,9 +182,13 @@ Timeline.tsx
     │                                   └── renders → GridEvent.tsx
     │                                                     └── calls → layoutUtils.getEventLayout()
     │
-    └── renders → NowIndicator.tsx
+    ├── renders → NowIndicator.tsx
+    │                 └── calls → useTimeline()
+    │                 └── calls → timeUtils.getPositionPercentage()
+    │
+    └── renders → EventModal.tsx (when modalEvent is set)
                       └── calls → useTimeline()
-                      └── calls → timeUtils.getPositionPercentage()
+                      └── calls → onStatusChange()
 ```
 
 ---
@@ -322,6 +330,71 @@ const STATUS_COLORS = {
   borderLeftColor: STATUS_COLORS[event.status].border,
   backgroundColor: STATUS_COLORS[event.status].bg,
 }} />
+```
+
+### 8. Event Duration Display
+
+**File:** `src/components/TimelineGrid/GridEvent.tsx`
+
+Each event card displays:
+- Timer icon with formatted duration (e.g., "1h30", "45min")
+- Status modifier text for delayed/early (e.g., "(30 min. delayed)", "(15 min. early)")
+
+```typescript
+// Calculate planned duration
+const plannedDuration = differenceInMinutes(event.endTime, event.startTime)
+
+// Check if there's a difference (delayed or early)
+const durationDiff = event.actualDuration 
+  ? event.actualDuration - plannedDuration 
+  : 0
+
+// Display delay/early modifier
+{durationDiff > 0 && (
+  <span className={styles.modifier} data-delayed>
+    ({durationDiff} min. delayed)
+  </span>
+)}
+{durationDiff < 0 && (
+  <span className={styles.modifier} data-early>
+    ({Math.abs(durationDiff)} min. early)
+  </span>
+)}
+```
+
+### 9. Event Status Modal
+
+**File:** `src/components/EventModal/EventModal.tsx`
+
+When `onStatusChange` is provided, clicking an event opens a modal dialog:
+
+```typescript
+// Context provides modal state
+const { modalEvent, isModalOpen, openEventModal, closeEventModal } = useTimeline()
+
+// GridEvent opens modal on click (when onStatusChange is set)
+const handleClick = (e) => {
+  onEventClick?.(event)
+  if (onStatusChange) {
+    openEventModal(event)
+  }
+}
+
+// EventModal submits status changes
+const handleSubmit = (change: StatusChange) => {
+  onStatusChange(change)
+  closeEventModal()
+}
+```
+
+**StatusChange interface:**
+
+```typescript
+interface StatusChange {
+  eventId: string
+  newStatus: EventStatus
+  actualDuration?: number  // Duration in minutes
+}
 ```
 
 ---
@@ -558,6 +631,49 @@ interface TimelineProps {
 </Tooltip>
 ```
 
+### Handle Status Changes (Consumer App)
+
+The `onStatusChange` callback enables the status modal. Handle it in your app:
+
+```tsx
+const [events, setEvents] = useState<TimelineEvent[]>(initialEvents)
+
+const handleStatusChange = (change: StatusChange) => {
+  setEvents((prevEvents) =>
+    prevEvents.map((event) =>
+      event.id === change.eventId
+        ? {
+            ...event,
+            status: change.newStatus,
+            actualDuration: change.actualDuration,
+          }
+        : event
+    )
+  )
+}
+
+<Timeline
+  events={events}
+  onStatusChange={handleStatusChange}  // Enables the modal
+  // ...other props
+/>
+```
+
+**Event data structure with duration:**
+
+```typescript
+interface TimelineEvent {
+  id: string
+  rowId: string
+  startTime: Date
+  endTime: Date
+  title: string
+  status?: EventStatus
+  actualEndTime?: Date      // For visual overflow on delayed tasks
+  actualDuration?: number   // Actual duration in minutes (for early/late display)
+}
+```
+
 ---
 
 ## Quick Reference
@@ -574,6 +690,8 @@ interface TimelineProps {
 | Name formatting    | `src/utils/layoutUtils.ts` → `formatRowLabel()`               |
 | Period markers     | `src/utils/timeUtils.ts` → `getPeriodMarker()`                |
 | Add new types      | `src/types/index.ts`                                          |
+| Status modal UI    | `src/components/EventModal/EventModal.tsx`                    |
+| Duration display   | `src/components/TimelineGrid/GridEvent.tsx` → duration logic  |
 
 ---
 
@@ -583,7 +701,7 @@ interface TimelineProps {
 # Start dev server with hot reload
 npm run dev
 
-# The demo at http://localhost:5174 will update automatically
+# The demo at http://localhost:5173 will update automatically
 
 # Check TypeScript errors
 npx tsc --noEmit
