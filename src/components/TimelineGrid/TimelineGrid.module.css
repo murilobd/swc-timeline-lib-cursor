@@ -49,8 +49,9 @@
 /* Drop zone indicator */
 .dropZone {
   position: absolute;
-  top: 8px;
-  bottom: 8px;
+  top: 10px;
+  bottom: 10px;
+  margin-left: 1px;
   border-radius: 4px;
   background: #D4CEED;
   pointer-events: none;

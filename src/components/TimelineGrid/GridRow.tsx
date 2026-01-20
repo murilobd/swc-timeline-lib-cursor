@@ -36,6 +36,7 @@ export function GridRow({ row }: GridRowProps) {
 
     const zones: DropZone[] = []
     const slotWidth = 12 // DEFAULT_SLOT_WIDTH
+    const indicatorWidth = 10 // Slightly smaller for visual gap
 
     // Check each slot in the timeline
     for (let slotIdx = 0; slotIdx < config.slotCount; slotIdx++) {
@@ -48,7 +49,7 @@ export function GridRow({ row }: GridRowProps) {
       if (result !== null && !result.blocked) {
         zones.push({
           left: slotIdx * slotWidth,
-          width: slotWidth,
+          width: indicatorWidth,
         })
       }
     }
