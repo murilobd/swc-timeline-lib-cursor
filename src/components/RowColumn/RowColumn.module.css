@@ -125,9 +125,22 @@
 }
 
 /* Collapsed state */
+[data-collapsed="true"] {
+  background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+  backdrop-filter: blur(4px);
+  border-right: none;
+  margin-right: -48px;
+  z-index: 16;
+}
+
 [data-collapsed="true"] .rowLabel {
   padding: 0 8px;
   justify-content: center;
+  border-bottom: none;
+}
+
+[data-collapsed="true"] .rowLabel[data-unavailable="true"] {
+  background: transparent;
 }
 
 [data-collapsed="true"] .labelContent {
