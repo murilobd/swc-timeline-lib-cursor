@@ -1,0 +1,59 @@
+.event {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--timeline-grid, #E5E5E5);
+  border-left-width: 4px;
+  background: #fff;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  z-index: 1;
+}
+
+.event:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 2;
+}
+
+/* Status-specific styles */
+.event[data-status="in-progress"] {
+  border-color: var(--timeline-accent, #7C7CFF);
+  box-shadow: 0 0 0 1px var(--timeline-accent, #7C7CFF);
+}
+
+.event[data-status="blocked"] {
+  color: #fff;
+}
+
+.event[data-status="completed"] {
+  opacity: 0.7;
+}
+
+.eventContent {
+  padding: 8px 12px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.eventTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Overflow indicator for delayed events */
+.overflow {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  border-radius: 0 4px 4px 0;
+  opacity: 0.6;
+  z-index: 0;
+}

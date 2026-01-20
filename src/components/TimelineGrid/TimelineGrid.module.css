@@ -1,0 +1,130 @@
+.gridContainer {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+}
+
+.grid {
+  position: relative;
+  min-height: 100%;
+}
+
+.hourLines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.hourLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--timeline-grid, #E5E5E5);
+}
+
+.rows {
+  position: relative;
+}
+
+.row {
+  height: var(--timeline-row-height, 96px);
+  position: relative;
+  border-bottom: 1px solid var(--timeline-grid, #E5E5E5);
+  cursor: pointer;
+}
+
+.row:hover {
+  background: rgba(124, 124, 255, 0.02);
+}
+
+.row[data-unavailable="true"] {
+  background: var(--timeline-grid-light, #F5F5F5);
+  cursor: default;
+}
+
+.row[data-unavailable="true"]:hover {
+  background: var(--timeline-grid-light, #F5F5F5);
+}
+
+.unavailableRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+  padding: 0 24px;
+}
+
+.unavailableDash {
+  font-size: 16px;
+  color: var(--timeline-text-muted, #999);
+}
+
+.unavailableLabel {
+  font-size: 14px;
+  color: var(--timeline-text-muted, #999);
+  font-style: italic;
+}
+
+/* Event positioning within row */
+.row > :not(.unavailableRow) {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+}
+
+/* Transition zone (shift handover) */
+.transitionZone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(124, 124, 255, 0.08) 0%,
+    rgba(124, 124, 255, 0.15) 50%,
+    rgba(124, 124, 255, 0.08) 100%
+  );
+  border-left: 2px solid rgba(124, 124, 255, 0.4);
+  border-right: 2px solid rgba(124, 124, 255, 0.4);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.transitionHeader {
+  position: absolute;
+  top: -44px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--timeline-accent, #7C7CFF);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.transitionRow {
+  height: var(--timeline-row-height, 96px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(124, 124, 255, 0.15);
+}
+
+.incomingName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--timeline-text, #333);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(124, 124, 255, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
