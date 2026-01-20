@@ -1,5 +1,5 @@
-import { differenceInMinutes } from 'date-fns'
-import type { TimelineEvent, ResolvedTimelineConfig } from '../types'
+import { differenceInMinutes, addMinutes } from 'date-fns'
+import type { TimelineEvent, ResolvedTimelineConfig, EventMove } from '../types'
 
 /**
  * Calculate event position and dimensions
@@ -122,4 +122,83 @@ export function formatRowLabel(
   }
   
   return `${firstName} ${lastInitial}.`
+}
+
+/**
+ * Calculate cascade effect when moving an event to a new time.
+ * Returns null if drop position overlaps an existing task.
+ * Returns { moves, blocked: true } if cascade would push a blocked task.
+ * Returns { moves, blocked: false } with all affected events on success.
+ */
+export function calculateCascade(
+  movedEventId: string,
+  newStartTime: Date,
+  rowEvents: TimelineEvent[]
+): { moves: EventMove[]; blocked: boolean } | null {
+  // Find the moved event
+  const movedEvent = rowEvents.find((e) => e.id === movedEventId)
+  if (!movedEvent) return null
+
+  // Calculate moved event duration
+  const duration = differenceInMinutes(movedEvent.endTime, movedEvent.startTime)
+  const newEndTime = addMinutes(newStartTime, duration)
+
+  // Get other events in the row (excluding the moved one)
+  const otherEvents = rowEvents.filter((e) => e.id !== movedEventId)
+
+  // Check if drop position overlaps any existing task
+  for (const event of otherEvents) {
+    // Overlap: newStartTime falls inside another event's time range
+    if (newStartTime >= event.startTime && newStartTime < event.endTime) {
+      return null // Invalid drop position
+    }
+  }
+
+  // Build list of moves, starting with the moved event
+  const moves: EventMove[] = [
+    {
+      eventId: movedEventId,
+      newStartTime,
+      newEndTime,
+    },
+  ]
+
+  // Get events that start at or after the moved event's new position
+  // and sort by their original start time
+  const eventsToCheck = otherEvents
+    .filter((e) => e.startTime >= newStartTime)
+    .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
+
+  // Track the end time of the last placed event
+  let lastEndTime = newEndTime
+
+  for (const event of eventsToCheck) {
+    const eventDuration = differenceInMinutes(event.endTime, event.startTime)
+
+    // Check if this event overlaps with the last placed event
+    if (event.startTime < lastEndTime) {
+      // This event needs to be pushed
+      if (event.status === 'blocked') {
+        // Cannot push a blocked event
+        return { moves: [], blocked: true }
+      }
+
+      // Push the event to start at lastEndTime
+      const pushedStartTime = lastEndTime
+      const pushedEndTime = addMinutes(pushedStartTime, eventDuration)
+
+      moves.push({
+        eventId: event.id,
+        newStartTime: pushedStartTime,
+        newEndTime: pushedEndTime,
+      })
+
+      lastEndTime = pushedEndTime
+    } else {
+      // No overlap, this event stays where it is
+      lastEndTime = event.endTime
+    }
+  }
+
+  return { moves, blocked: false }
 }
