@@ -29,13 +29,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  border-left: 1px solid var(--timeline-grid, #E5E5E5);
+  align-items: flex-start;
   padding: 4px 0;
 }
 
-.hourColumn:first-child {
-  border-left: none;
+.hourColumn > * {
+  transform: translateX(-50%);
 }
 
 .timeLabel {
