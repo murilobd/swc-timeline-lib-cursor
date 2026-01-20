@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Timeline } from '@/index'
-import type { EventMove, TimelineEvent } from '@/types'
+import type { EventMove, TimelineEvent, StatusChange } from '@/types'
 import { mockRows, mockPeriods, mockEvents, getDefaultConfig } from './mockData'
 
 function App() {
@@ -25,6 +25,24 @@ function App() {
     })
   }, [])
 
+  // Handle status change from modal
+  const handleStatusChange = useCallback((change: StatusChange) => {
+    console.log('Status changed:', change)
+    
+    setEvents((prevEvents) => {
+      return prevEvents.map((event) => {
+        if (event.id === change.eventId) {
+          return {
+            ...event,
+            status: change.newStatus,
+            actualDuration: change.actualDuration,
+          }
+        }
+        return event
+      })
+    })
+  }, [])
+
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
       <Timeline
@@ -35,6 +53,7 @@ function App() {
         onEventClick={(event) => console.log('Event clicked:', event)}
         onSlotClick={(rowId, time) => console.log('Slot clicked:', rowId, time)}
         onEventMove={handleEventMove}
+        onStatusChange={handleStatusChange}
       />
     </div>
   )

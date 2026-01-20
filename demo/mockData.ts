@@ -65,6 +65,7 @@ export const mockEvents: TimelineEvent[] = [
     title: 'Task',
     status: 'delayed',
     actualEndTime: addHours(today, 12),
+    actualDuration: 120, // Took 2h instead of 1h30 (30 min delayed)
   },
   {
     id: 'event-2',
@@ -73,6 +74,7 @@ export const mockEvents: TimelineEvent[] = [
     endTime: addMinutes(addHours(today, 12), 45),
     title: 'Task',
     status: 'early',
+    actualDuration: 30, // Finished 15 min early (planned 45min, took 30min)
   },
   {
     id: 'event-3',
@@ -179,6 +181,7 @@ export const mockEvents: TimelineEvent[] = [
     endTime: addMinutes(addHours(today, 10), 45),
     title: 'Task',
     status: 'early',
+    actualDuration: 30, // Finished 15 min early
   },
   {
     id: 'event-16',
@@ -204,6 +207,7 @@ export const mockEvents: TimelineEvent[] = [
     endTime: addMinutes(addHours(today, 12), 45),
     title: 'Task',
     status: 'early',
+    actualDuration: 35, // Finished 10 min early
   },
   {
     id: 'event-19',
