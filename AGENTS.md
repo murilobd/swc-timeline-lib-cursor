@@ -19,3 +19,9 @@ A flexible, generic React + TypeScript timeline library for visualizing time-bas
 
 - Use HOW-TO-DEV.md as a reference for the architecture and logic behind project implementation
 - Use README.md for more general information of how to run and use the library
+
+## Commit messages
+
+- Use [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) structure to do commits
+- Single line with short description of what has changed
+- Add some [Emoji](https://gitmoji.dev/) before the message to simplify the understandig of what the commit is about

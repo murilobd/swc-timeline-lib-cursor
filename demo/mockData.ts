@@ -15,13 +15,13 @@ export const mockRows: Row[] = [
   { id: 'row-7', indicator: { color: '#4CAF50' } },
 ]
 
-// Morning shift: 6h00 - 14h00
-// Afternoon shift: 14h00 - 22h00
-// Night shift: 22h00 - 6h00
+// Morning shift: 0h00 - 8h00
+// Afternoon shift: 8h00 - 16h00
+// Night shift: 16h00 - 24h00
 
-const morningShiftStart = addHours(today, 6)
-const afternoonShiftStart = addHours(today, 14)
-const nightShiftStart = addHours(today, 22)
+const morningShiftStart = addHours(today, 0)
+const afternoonShiftStart = addHours(today, 8)
+const nightShiftStart = addHours(today, 16)
 
 export const mockPeriods: Period[] = [
   {
