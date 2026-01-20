@@ -1,0 +1,255 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  min-width: 360px;
+  max-width: 480px;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.body {
+  padding: 20px 24px;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.statusButton {
+  padding: 10px 12px;
+  border: 2px solid #E5E5E5;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.statusButton:hover {
+  border-color: #C4C4FF;
+  background: #F8F8FF;
+}
+
+.statusButton.selected {
+  border-color: #7C7CFF;
+  background: #F0F0FF;
+  color: #5C5CDF;
+}
+
+.statusButton[data-status="planned"] { border-left: 4px solid #C4C4FF; }
+.statusButton[data-status="in-progress"] { border-left: 4px solid #7C7CFF; }
+.statusButton[data-status="delayed"] { border-left: 4px solid #FF6B6B; }
+.statusButton[data-status="early"] { border-left: 4px solid #4CAF50; }
+.statusButton[data-status="blocked"] { border-left: 4px solid #8B0000; }
+.statusButton[data-status="completed"] { border-left: 4px solid #CCCCCC; }
+
+.statusButton[data-status="delayed"].selected {
+  border-color: #FF6B6B;
+  background: #FFF5F5;
+  color: #D32F2F;
+}
+
+.statusButton[data-status="early"].selected {
+  border-color: #4CAF50;
+  background: #F5FFF5;
+  color: #2E7D32;
+}
+
+.statusButton[data-status="blocked"].selected {
+  border-color: #8B0000;
+  background: #FFF5F5;
+  color: #8B0000;
+}
+
+.statusButton[data-status="completed"].selected {
+  border-color: #888;
+  background: #F5F5F5;
+  color: #666;
+}
+
+.durationSection {
+  background: #F8F9FA;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.durationRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.durationRow:last-child {
+  margin-bottom: 0;
+}
+
+.durationLabel {
+  font-size: 13px;
+  color: #666;
+}
+
+.durationValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.durationInputGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.durationInput {
+  width: 80px;
+  padding: 8px 12px;
+  border: 1px solid #DDD;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.durationInput:focus {
+  outline: none;
+  border-color: #7C7CFF;
+  box-shadow: 0 0 0 2px rgba(124, 124, 255, 0.2);
+}
+
+.durationUnit {
+  font-size: 13px;
+  color: #666;
+}
+
+.diffIndicator {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.diffIndicator.delayed {
+  background: #FFEBEE;
+  color: #D32F2F;
+}
+
+.diffIndicator.early {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.footer {
+  padding: 16px 24px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid #E5E5E5;
+}
+
+.button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.buttonCancel {
+  background: #F5F5F5;
+  border: 1px solid #DDD;
+  color: #666;
+}
+
+.buttonCancel:hover {
+  background: #EBEBEB;
+}
+
+.buttonSubmit {
+  background: #7C7CFF;
+  border: none;
+  color: #fff;
+}
+
+.buttonSubmit:hover {
+  background: #6B6BEE;
+}
+
+.buttonSubmit:disabled {
+  background: #CCC;
+  cursor: not-allowed;
+}
