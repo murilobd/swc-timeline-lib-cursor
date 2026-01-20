@@ -49,6 +49,7 @@ export function formatHour(
 
 /**
  * Calculate period marker (T0, T1, T2, etc.) for a given hour
+ * Cycles from T0 to T7, then restarts at T0
  */
 export function getPeriodMarker(
   hourDate: Date,
@@ -59,12 +60,10 @@ export function getPeriodMarker(
     differenceInMinutes(hourDate, referenceTime) / 60
   )
   
-  if (hoursDiff < 0) {
-    // Before reference time, show negative or wrap around
-    return `${prefix}${hoursDiff}`
-  }
+  // Cycle 0-7, handling negative numbers correctly
+  const marker = ((hoursDiff % 8) + 8) % 8
   
-  return `${prefix}${hoursDiff}`
+  return `${prefix}${marker}`
 }
 
 /**
