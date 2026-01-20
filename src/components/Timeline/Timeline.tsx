@@ -17,8 +17,8 @@ export function Timeline(props: TimelineProps) {
         <div className={styles.body}>
           <RowColumn />
           <TimelineGrid />
-          <NowIndicator />
         </div>
+        <NowIndicator />
       </div>
     </TimelineProvider>
   )
