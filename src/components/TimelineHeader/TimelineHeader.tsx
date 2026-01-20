@@ -4,7 +4,7 @@ import { getHourMarkers, formatHour, getPeriodMarker } from '../../utils/timeUti
 import styles from './TimelineHeader.module.css'
 
 export function TimelineHeader() {
-  const { config, rowColumnWidth, totalGridWidth } = useTimeline()
+  const { config, rowColumnWidth, totalGridWidth, scrollLeft } = useTimeline()
 
   const hourMarkers = useMemo(() => {
     return getHourMarkers(config.startDate, config.endDate)
@@ -21,7 +21,13 @@ export function TimelineHeader() {
       />
 
       {/* Time labels */}
-      <div className={styles.timeLabels} style={{ width: totalGridWidth }}>
+      <div
+        className={styles.timeLabels}
+        style={{
+          width: totalGridWidth,
+          transform: `translateX(-${scrollLeft}px)`,
+        }}
+      >
         {hourMarkers.map((hourDate, index) => {
           const timeLabel = formatHour(hourDate, config.hourFormat)
           const periodMarker =
