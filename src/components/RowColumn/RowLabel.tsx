@@ -11,7 +11,7 @@ interface RowLabelProps {
 }
 
 export function RowLabel({ row, isCollapsed }: RowLabelProps) {
-  const { periods, currentTime, visibleRange, renderRowLabel } = useTimeline()
+  const { periods, visibleRange, renderRowLabel } = useTimeline()
 
   // Get the label for this row at the visible time
   const visibleMidpoint = useMemo(() => {
@@ -44,10 +44,20 @@ export function RowLabel({ row, isCollapsed }: RowLabelProps) {
   }, [row.id, visibleMidpoint, periods, transition])
 
   // Format the display name
-  const displayLabel = formatRowLabel(currentLabel, isCollapsed)
+  const displayLabel = formatRowLabel(currentLabel, false) // Always use full format for text
   const displayIncoming = incomingLabel
-    ? formatRowLabel(incomingLabel, isCollapsed)
+    ? formatRowLabel(incomingLabel, false)
     : undefined
+
+  // Get initials for collapsed avatar
+  const initials = useMemo(() => {
+    if (!currentLabel) return ''
+    const parts = currentLabel.trim().split(' ')
+    if (parts.length === 1) {
+      return parts[0].charAt(0).toUpperCase()
+    }
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
+  }, [currentLabel])
 
   // Check if row is unavailable
   const isUnavailable =
@@ -61,15 +71,46 @@ export function RowLabel({ row, isCollapsed }: RowLabelProps) {
     }
   }
 
+  // Collapsed view: show avatar badge with initials
+  if (isCollapsed) {
+    return (
+      <div className={styles.rowLabel} data-unavailable={isUnavailable}>
+        {isUnavailable ? (
+          <div className={styles.avatarBadge}>
+            <span className={styles.avatarInitials}>—</span>
+          </div>
+        ) : (
+          <div className={styles.avatarBadge}>
+            <span className={styles.avatarInitials}>{initials}</span>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Expanded view: show indicator + full name
   return (
     <div className={styles.rowLabel} data-unavailable={isUnavailable}>
       {/* Status indicator */}
       {row.indicator && (
-        <div
-          className={styles.indicator}
-          style={{ backgroundColor: row.indicator.color }}
-          title={row.indicator.tooltip}
-        />
+        <div className={styles.indicator} title={row.indicator.tooltip}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+          >
+            <circle
+              cx="8"
+              cy="8"
+              r="5"
+              fill="#5718B0"
+              stroke="#B3A8E6"
+              strokeWidth="6"
+            />
+          </svg>
+        </div>
       )}
 
       {/* Label content */}

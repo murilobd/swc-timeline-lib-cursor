@@ -25,10 +25,64 @@
 }
 
 .indicator {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.indicatorDot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+}
+
+/* Avatar badge for collapsed state */
+.avatarBadge {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex-shrink: 0;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  background: transparent;
+  position: relative;
+}
+
+/* Outer gradient ring with 30% opacity */
+.avatarBadge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(216, 180, 254, 0.3));
+  z-index: 0;
+}
+
+/* Inner circle for initials */
+.avatarBadge::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: #B3A8E6;
+  z-index: 1;
+}
+
+.avatarInitials {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  color: #23004C;
 }
 
 .labelContent {
