@@ -17,6 +17,7 @@ import type {
   TimelineConfig,
   ResolvedTimelineConfig,
   VisibleRange,
+  EventMove,
 } from '../types'
 import {
   DEFAULT_SLOT_DURATION,
@@ -55,6 +56,7 @@ interface TimelineContextValue {
   onEventClick?: (event: TimelineEvent) => void
   onSlotClick?: (rowId: string, time: Date) => void
   onScroll?: (visibleRange: VisibleRange) => void
+  onEventMove?: (moves: EventMove[]) => void
 
   // Custom rendering
   renderEvent?: (event: TimelineEvent, defaultRender: ReactNode) => ReactNode
@@ -72,6 +74,7 @@ interface TimelineProviderProps {
   onEventClick?: (event: TimelineEvent) => void
   onSlotClick?: (rowId: string, time: Date) => void
   onScroll?: (visibleRange: VisibleRange) => void
+  onEventMove?: (moves: EventMove[]) => void
   renderEvent?: (event: TimelineEvent, defaultRender: ReactNode) => ReactNode
   renderRowLabel?: (row: Row, label: string, isCollapsed: boolean) => ReactNode
   rowColumnWidth?: { expanded: number; collapsed: number }
@@ -86,6 +89,7 @@ export function TimelineProvider({
   onEventClick,
   onSlotClick,
   onScroll,
+  onEventMove,
   renderEvent,
   renderRowLabel,
   rowColumnWidth: rowColumnWidthConfig,
@@ -224,6 +228,7 @@ export function TimelineProvider({
       onEventClick,
       onSlotClick,
       onScroll,
+      onEventMove,
       renderEvent,
       renderRowLabel,
     }),
@@ -245,6 +250,7 @@ export function TimelineProvider({
       onEventClick,
       onSlotClick,
       onScroll,
+      onEventMove,
       renderEvent,
       renderRowLabel,
     ]
