@@ -25,3 +25,8 @@ A flexible, generic React + TypeScript timeline library for visualizing time-bas
 - Use [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) structure to do commits
 - Single line with short description of what has changed
 - Add some [Emoji](https://gitmoji.dev/) before the message to simplify the understandig of what the commit is about
+
+
+## Implementation of a plan
+
+- Whenever it's implementing a plan, when a task is done, do a commit before moving on
